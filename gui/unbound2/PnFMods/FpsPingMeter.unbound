@@ -1,0 +1,224 @@
+(def constant TT_FPSPINGMETER_INSTALLED true) #for modconfig
+
+(def constant FPM_THRESHOLDS {
+	MODIFIER: {
+		PING: 10,
+		FPS : 5,
+	},
+	OFFSET: {
+		PING	: 50,
+		FPS		: 30,
+	},
+})
+
+(def constant FPM_FONT_SIZE "
+	[
+		13,	# Default
+		15,	# Large
+		17,	# Gigantic
+	]
+")
+
+(def constant FPM_FONT_STYLE_MESSAGE "
+	[
+		'$FPM_MessageDefaultStyle',	# Default/Dark
+		'$FPM_MessageLightStyle',	# Light
+	]
+")
+
+(def constant FPM_FONT_STYLE_VALUE "
+	[
+		'$FPM_ValueDefalutStyle',	# Default/Dark
+		'$FPM_ValueLightStyle',		# Light
+	]
+")
+
+(def constant FPM_USERPREFS_KEY {
+	FONT_SIZE: 'fpsPingMeterFontSize',
+	FONT_STYLE: 'fpsPingMeterFontStyle',
+	FPS_WARN_THRESHOLD: 'fpsPingMeterFpsWarnThreshold',
+	FPS_CRIT_THRESHOLD: 'fpsPingMeterFpsCritThreshold',
+	PING_WARN_THRESHOLD: 'fpsPingMeterPingWarnThreshold',
+	PING_CRIT_THRESHOLD: 'fpsPingMeterPingCritThreshold',
+})
+
+(def constant FPM_FONT_COLOR {
+	CRITICAL		: 0xff4b1d,
+	WARNING			: 0xffb600,
+	THEME_DEFAULT	: 0xe5161616,
+	THEME_LIGHT		: 0xFFFFFF,
+})
+
+(def css $FPM_MessageDefaultStyle()
+	(extends $FontFamilyDefault)
+	(extends $FontFpsDropShadowWhite)
+	(extends $FontColorFPS)
+	(extends $TextMouseDisable)
+)
+
+(def css $FPM_ValueDefalutStyle()
+	(extends $FontFamilyDefaultBold)
+	(extends $FontFpsDropShadowWhite)
+	(extends $FontColorFPS)
+	(extends $TextMouseDisable)
+)
+
+(def css $FPM_MessageLightStyle()
+	(extends $FPM_MessageDefaultStyle)
+	(extends $FontColorWhite)
+	(extends $FontDropShadowFilter)
+)
+
+(def css $FPM_ValueLightStyle()
+	(extends $FPM_ValueDefalutStyle)
+	(extends $FontColorWhite)
+	(extends $FontDropShadowFilter)
+)
+
+(def macro FPM_GET_USERPREF()
+	(var userPrefsComponent:gfx = "$datahub.getSingleComponent(CC.userPrefs)")
+	(var userPrefsNum:gfx = "userPrefsComponent.userPrefs.chatBoxWidth" watch=false (event "userPrefsComponent.evUserPrefsChanged"))
+)
+
+(def macro FPM_GET_PREF_NUMBER (_varName:expression, _prefKey:expression, _default:expression="0", _offset:expression="0.0", _modifier:expression="1.0")
+	(var name="_varName" type=number value="(userPrefsNum && userPrefsNum[_prefKey] != null) ? _offset + (round(userPrefsNum[_prefKey]) * _modifier) : _default")
+)
+
+(def macro FPM_GET_PREF_BOOL (_varName:expression, _prefKey:expression, _default:expression="true")
+	(var name="_varName" type=bool value="(userPrefsNum && userPrefsNum[_prefKey] != null) ? round(userPrefsNum[_prefKey]) : _default")
+)
+
+
+(def element FpsDisplay(fps:number) layout=true
+	# mod
+	(scope
+		(macro FPM_GET_USERPREF)
+		(macro FPM_GET_PREF_NUMBER _varName="'fontStylePrefIndex'" _prefKey="FPM_USERPREFS_KEY.FONT_STYLE" _modifier="1" _default="0")
+		(macro FPM_GET_PREF_NUMBER _varName="'fontSizePrefIndex'" _prefKey="FPM_USERPREFS_KEY.FONT_SIZE" _modifier="1" _default="0")
+		(macro FPM_GET_PREF_NUMBER _varName="'fpsWarnThreshold'" _prefKey="FPM_USERPREFS_KEY.FPS_WARN_THRESHOLD" _offset="FPM_THRESHOLDS.OFFSET.FPS" _modifier="FPM_THRESHOLDS.MODIFIER.FPS" _default="55")
+		(macro FPM_GET_PREF_NUMBER _varName="'fpsCritThreshold'" _prefKey="FPM_USERPREFS_KEY.FPS_CRIT_THRESHOLD" _offset="FPM_THRESHOLDS.OFFSET.FPS" _modifier="FPM_THRESHOLDS.MODIFIER.FPS" _default="30")
+
+		(var fontStyleIndex:number = "fontStylePrefIndex < FPM_FONT_STYLE_MESSAGE.length ? fontStylePrefIndex : 0")
+		(var fontSizeIndex:number = "fontSizePrefIndex < FPM_FONT_SIZE.length ? fontSizePrefIndex : 0")
+
+		(var messageFontStyle:str = "FPM_FONT_STYLE_MESSAGE[fontStyleIndex]")
+		(var valueFontStyle:str = "FPM_FONT_STYLE_VALUE[fontStyleIndex]")
+		(var fontSize:number = "FPM_FONT_SIZE[fontSizeIndex]")
+
+		(var warningColor:number = "fps < fpsCritThreshold	? FPM_FONT_COLOR.CRITICAL :
+									fps < fpsWarnThreshold	? FPM_FONT_COLOR.WARNING :
+									fontStyleIndex == 0   	? FPM_FONT_COLOR.THEME_DEFAULT
+															: FPM_FONT_COLOR.THEME_LIGHT
+		"
+		)
+	)
+	#
+
+	(style
+		(flow = "horizontal")
+	)
+
+	(tf
+		# mod
+		(bind class "valueFontStyle")
+		#
+		(bind text "fps")
+		(style
+			(bind minWidth "floor(fps/10) ? 18 : 12")
+			(bind fontSize "fontSize")
+			(bind textColor "warningColor")
+			(filters 
+				(dropShadow 
+					(distance = 0)
+					(angle = 90)
+					(bind color "fps < fpsWarnThreshold ? 0x000000 : 0xFFFFFF")
+					(alpha = 1.0)
+					(blurX = 2.0)
+					(blurY = 2.0)
+					(strength = 0.6)
+					(quality = 2)
+				)
+			)
+		)
+	)
+	(tf
+		# mod
+		(bind class "messageFontStyle")
+		(style
+			(bind fontSize "fontSize")
+		)
+		#
+		(text = 'FPS')
+	)
+)
+
+(def element PingDisplay(ping:number) layout=true
+	# mod
+	(scope
+		(macro FPM_GET_USERPREF)
+		(macro FPM_GET_PREF_NUMBER _varName="'fontStylePrefIndex'" _prefKey="FPM_USERPREFS_KEY.FONT_STYLE" _modifier="1" _default="0")
+		(macro FPM_GET_PREF_NUMBER _varName="'fontSizePrefIndex'" _prefKey="FPM_USERPREFS_KEY.FONT_SIZE" _modifier="1" _default="0")
+		(macro FPM_GET_PREF_NUMBER _varName="'pingWarnThreshold'" _prefKey="FPM_USERPREFS_KEY.PING_WARN_THRESHOLD" _offset="FPM_THRESHOLDS.OFFSET.PING" _modifier="FPM_THRESHOLDS.MODIFIER.PING" _default="100")
+		(macro FPM_GET_PREF_NUMBER _varName="'pingCritThreshold'" _prefKey="FPM_USERPREFS_KEY.PING_CRIT_THRESHOLD" _offset="FPM_THRESHOLDS.OFFSET.PING" _modifier="FPM_THRESHOLDS.MODIFIER.PING" _default="150")
+
+		(var fontStyleIndex:number = "fontStylePrefIndex < FPM_FONT_STYLE_MESSAGE.length ? fontStylePrefIndex : 0")
+		(var fontSizeIndex:number = "fontSizePrefIndex < FPM_FONT_SIZE.length ? fontSizePrefIndex : 0")
+
+		(var messageFontStyle:str = "FPM_FONT_STYLE_MESSAGE[fontStyleIndex]")
+		(var valueFontStyle:str = "FPM_FONT_STYLE_VALUE[fontStyleIndex]")
+		(var fontSize:number = "FPM_FONT_SIZE[fontSizeIndex]")
+		(var warningColor:number = "ping > pingCritThreshold	? FPM_FONT_COLOR.CRITICAL :
+									ping > pingWarnThreshold	? FPM_FONT_COLOR.WARNING :
+									fontStyleIndex == 0 		? FPM_FONT_COLOR.THEME_DEFAULT
+																: FPM_FONT_COLOR.THEME_LIGHT
+		"
+		)
+	)
+	#
+	(bind visible "ping > 0")
+	(style
+		(flow = "horizontal")
+	)
+
+	(tf
+		# mod
+		(bind class "messageFontStyle")
+		(style
+			(bind fontSize "fontSize")
+		)
+		#
+		(text = 'ping')
+	)
+	(tf
+		# mod
+		(bind class "valueFontStyle")
+		#
+		(style
+			(bind minWidth "floor(ping/100) ? 24 : 18")
+			(bind textColor "warningColor")
+			(bind fontSize "fontSize")
+			(filters 
+				(dropShadow 
+					(distance = 0)
+					(angle = 90)
+					(bind color "ping > pingWarnThreshold ? 0x000000 : 0xFFFFFF")
+					(alpha = 1.0)
+					(blurX = 2.0)
+					(blurY = 2.0)
+					(strength = 0.6)
+					(quality = 2)
+				)
+			)
+		)
+		(bind text "ping")
+	)
+	(tf
+		# mod
+		(bind class "messageFontStyle")
+		(style
+			(bind fontSize "fontSize")
+		)
+		#
+		(text = 'ms')
+	)
+)
