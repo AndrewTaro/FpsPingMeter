@@ -11,27 +11,27 @@
 	},
 })
 
-(def constant FPM_FONT_SIZE "
+(def constant FPM_FONT_SIZE
 	[
 		13,	# Default
 		15,	# Large
 		17,	# Gigantic
 	]
-")
+)
 
-(def constant FPM_FONT_STYLE_MESSAGE "
+(def constant FPM_FONT_STYLE_MESSAGE
 	[
 		'$FPM_MessageDefaultStyle',	# Default/Dark
 		'$FPM_MessageLightStyle',	# Light
 	]
-")
+)
 
-(def constant FPM_FONT_STYLE_VALUE "
+(def constant FPM_FONT_STYLE_VALUE
 	[
 		'$FPM_ValueDefalutStyle',	# Default/Dark
 		'$FPM_ValueLightStyle',		# Light
 	]
-")
+)
 
 (def constant FPM_USERPREFS_KEY {
 	FONT_SIZE: 'fpsPingMeterFontSize',
