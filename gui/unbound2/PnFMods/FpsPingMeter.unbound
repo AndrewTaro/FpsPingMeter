@@ -81,11 +81,11 @@
 )
 
 (def macro FPM_GET_PREF_NUMBER (_varName:expression, _prefKey:expression, _default:expression="0", _offset:expression="0.0", _modifier:expression="1.0")
-	(var name="_varName" type=number value="(userPrefsNum && userPrefsNum[_prefKey] != null) ? _offset + (round(userPrefsNum[_prefKey]) * _modifier) : _default")
+	(var name="_varName" type=number value="(userPrefsNum && toString(userPrefsNum[_prefKey]) != null) ? _offset + (round(userPrefsNum[_prefKey]) * _modifier) : _default")
 )
 
 (def macro FPM_GET_PREF_BOOL (_varName:expression, _prefKey:expression, _default:expression="true")
-	(var name="_varName" type=bool value="(userPrefsNum && userPrefsNum[_prefKey] != null) ? round(userPrefsNum[_prefKey]) : _default")
+	(var name="_varName" type=bool value="(userPrefsNum && toString(userPrefsNum[_prefKey]) != null) ? round(userPrefsNum[_prefKey]) : _default")
 )
 
 
