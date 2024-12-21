@@ -22,15 +22,6 @@
 	]
 )
 
-(def constant FPM_PREFS {
-	FONT_SIZE:			 {KEY: 'fpsPingMeterFontSize',			DEFAULT: 0,		MODIFIER: 1,	OFFSET: 0},
-	FONT_STYLE:			 {KEY: 'fpsPingMeterFontStyle',			DEFAULT: 0,		MODIFIER: 1,	OFFSET: 0},
-	FPS_WARN_THRESHOLD:	 {KEY: 'fpsPingMeterFpsWarnThreshold',	DEFAULT: 55,	MODIFIER: 5,	OFFSET: 30},
-	FPS_CRIT_THRESHOLD:	 {KEY: 'fpsPingMeterFpsCritThreshold',	DEFAULT: 30,	MODIFIER: 5,	OFFSET: 30},
-	PING_WARN_THRESHOLD: {KEY: 'fpsPingMeterPingWarnThreshold', DEFAULT: 100,	MODIFIER: 10,	OFFSET: 50},
-	PING_CRIT_THRESHOLD: {KEY: 'fpsPingMeterPingCritThreshold',	DEFAULT: 150,	MODIFIER: 10,	OFFSET: 50},
-})
-
 (def constant FPM_FONT_COLOR {
 	CRITICAL		: 0xff4b1d,
 	WARNING			: 0xffb600,
@@ -64,28 +55,15 @@
 	(extends $FontDropShadowFilter)
 )
 
-(def macro FPM_GET_USERPREF()
-	(var userPrefsComponent:gfx = "$datahub.getSingleComponent(CC.userPrefs)")
-	(var userPrefsNum:gfx = "userPrefsComponent.userPrefs.chatBoxWidth" watch=false (event "userPrefsComponent.evUserPrefsChanged"))
-)
-
-(def macro FPM_GET_PREF_NUMBER (_varName:expression, _pref:expression)
-	(var name="_varName" type=number value="userPrefsNum && isNumber(userPrefsNum[_pref.KEY]) ? _pref.OFFSET + (round(userPrefsNum[_pref.KEY]) * _pref.MODIFIER) : _pref.DEFAULT")
-)
-
-(def macro FPM_GET_PREF_BOOL (_varName:expression, _pref:expression)
-	(var name="_varName" type=bool value="userPrefsNum && isNumber(userPrefsNum[_pref.KEY]) ? round(userPrefsNum[_pref.KEY]) : _pref.DEFAULT")
-)
-
 
 (def element FpsDisplay(fps:number) layout=true
 	# mod
 	(scope
-		(macro FPM_GET_USERPREF)
-		(macro FPM_GET_PREF_NUMBER _varName="'fontStylePrefIndex'"	_pref="FPM_PREFS.FONT_STYLE")
-		(macro FPM_GET_PREF_NUMBER _varName="'fontSizePrefIndex'"	_pref="FPM_PREFS.FONT_SIZE")
-		(macro FPM_GET_PREF_NUMBER _varName="'fpsWarnThreshold'"	_pref="FPM_PREFS.FPS_WARN_THRESHOLD")
-		(macro FPM_GET_PREF_NUMBER _varName="'fpsCritThreshold'"	_pref="FPM_PREFS.FPS_CRIT_THRESHOLD")
+		(macro TT_GET_USERPREF)
+		(macro TT_GET_PREF_NUMBER _varName="'fontStylePrefIndex'"	_pref="FPM_PREFS.FONT_STYLE")
+		(macro TT_GET_PREF_NUMBER _varName="'fontSizePrefIndex'"	_pref="FPM_PREFS.FONT_SIZE")
+		(macro TT_GET_PREF_NUMBER _varName="'fpsWarnThreshold'"	_pref="FPM_PREFS.FPS_WARN_THRESHOLD")
+		(macro TT_GET_PREF_NUMBER _varName="'fpsCritThreshold'"	_pref="FPM_PREFS.FPS_CRIT_THRESHOLD")
 
 		(var fontStyleIndex:number = "fontStylePrefIndex < FPM_FONT_STYLE_MESSAGE.length ? fontStylePrefIndex : 0")
 		(var fontSizeIndex:number = "fontSizePrefIndex < FPM_FONT_SIZE.length ? fontSizePrefIndex : 0")
@@ -144,11 +122,11 @@
 (def element PingDisplay(ping:number) layout=true
 	# mod
 	(scope
-		(macro FPM_GET_USERPREF)
-		(macro FPM_GET_PREF_NUMBER _varName="'fontStylePrefIndex'"	_pref="FPM_PREFS.FONT_STYLE")
-		(macro FPM_GET_PREF_NUMBER _varName="'fontSizePrefIndex'"	_pref="FPM_PREFS.FONT_SIZE")
-		(macro FPM_GET_PREF_NUMBER _varName="'pingWarnThreshold'"	_pref="FPM_PREFS.PING_WARN_THRESHOLD")
-		(macro FPM_GET_PREF_NUMBER _varName="'pingCritThreshold'"	_pref="FPM_PREFS.PING_CRIT_THRESHOLD")
+		(macro TT_GET_USERPREF)
+		(macro TT_GET_PREF_NUMBER _varName="'fontStylePrefIndex'"	_pref="FPM_PREFS.FONT_STYLE")
+		(macro TT_GET_PREF_NUMBER _varName="'fontSizePrefIndex'"	_pref="FPM_PREFS.FONT_SIZE")
+		(macro TT_GET_PREF_NUMBER _varName="'pingWarnThreshold'"	_pref="FPM_PREFS.PING_WARN_THRESHOLD")
+		(macro TT_GET_PREF_NUMBER _varName="'pingCritThreshold'"	_pref="FPM_PREFS.PING_CRIT_THRESHOLD")
 
 		(var fontStyleIndex:number = "fontStylePrefIndex < FPM_FONT_STYLE_MESSAGE.length ? fontStylePrefIndex : 0")
 		(var fontSizeIndex:number = "fontSizePrefIndex < FPM_FONT_SIZE.length ? fontSizePrefIndex : 0")
