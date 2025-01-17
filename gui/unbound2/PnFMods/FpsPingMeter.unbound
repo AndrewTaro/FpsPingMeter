@@ -56,10 +56,9 @@
 )
 
 
-(def element FpsDisplay(fps:number) layout=true
+(def element FpsDisplay(fps:number, _userPrefsNum:gfx=null) layout=true
 	# mod
 	(scope
-		(macro TT_GET_USERPREF)
 		(macro TT_GET_PREF_NUMBER _varName="'fontStylePrefIndex'"	_pref="FPM_PREFS.FONT_STYLE")
 		(macro TT_GET_PREF_NUMBER _varName="'fontSizePrefIndex'"	_pref="FPM_PREFS.FONT_SIZE")
 		(macro TT_GET_PREF_NUMBER _varName="'fpsWarnThreshold'"	_pref="FPM_PREFS.FPS_WARN_THRESHOLD")
@@ -119,10 +118,9 @@
 	)
 )
 
-(def element PingDisplay(ping:number) layout=true
+(def element PingDisplay(ping:number, _userPrefsNum:gfx=null) layout=true
 	# mod
 	(scope
-		(macro TT_GET_USERPREF)
 		(macro TT_GET_PREF_NUMBER _varName="'fontStylePrefIndex'"	_pref="FPM_PREFS.FONT_STYLE")
 		(macro TT_GET_PREF_NUMBER _varName="'fontSizePrefIndex'"	_pref="FPM_PREFS.FONT_SIZE")
 		(macro TT_GET_PREF_NUMBER _varName="'pingWarnThreshold'"	_pref="FPM_PREFS.PING_WARN_THRESHOLD")
@@ -187,5 +185,58 @@
 		)
 		#
 		(text = 'ms')
+	)
+)
+
+(def element FpsPanel() layout=true
+	(scope
+		(macro GET_PREF 'showPerformance' "'ui.showPerformance'")
+
+		(var performance:gfx="$datahub.getSingleEntity(CC.performanceInfo).performanceInfo")
+		(var fps:number = "performance.fps" (event "performance.evChanged"))
+		(var ping:number = "performance.ping" (event "performance.evChanged"))
+		(var replayFps:number = "performance.replayFps" (event "performance.evChanged"))
+		(var replayPing:number = "performance.replayPing" (event "performance.evChanged"))
+
+		# Mod
+		(macro TT_GET_USERPREF)
+		(macro TT_GET_PREF_NUMBER _varName="'fontStylePrefIndex'"	_pref="FPM_PREFS.FONT_STYLE")
+		(macro TT_GET_PREF_NUMBER _varName="'fontSizePrefIndex'"	_pref="FPM_PREFS.FONT_SIZE")
+
+		(var fontStyleIndex:number = "fontStylePrefIndex < FPM_FONT_STYLE_MESSAGE.length ? fontStylePrefIndex : 0")
+		(var fontSizeIndex:number = "fontSizePrefIndex < FPM_FONT_SIZE.length ? fontSizePrefIndex : 0")
+
+		(var messageFontStyle:str = "FPM_FONT_STYLE_MESSAGE[fontStyleIndex]")
+		(var fontSize:number = "FPM_FONT_SIZE[fontSizeIndex]")
+		#
+	)
+
+	(bindcall externalCall 'direct.action' "['option.set', ['ui.showPerformance', true]]" init=false watch=false on='addedToStage')
+
+	(bind visible "showPerformance")
+
+	(style
+		(position = "absolute")
+		(paddingTop = 2)
+		(paddingLeft = 3)
+	)
+
+	(hblock
+		(element FpsDisplay "fps"	_userPrefsNum="_userPrefsNum")
+		(element PingDisplay "ping" _userPrefsNum="_userPrefsNum")
+	)
+
+	(hblock
+		(bind visible "replayFps > 0 || replayPing > 0")
+		(tf
+			(bind class "messageFontStyle")
+			(style
+				(bind fontSize "fontSize")
+			)
+			(text = 'Recorded')
+		)
+
+		(element FpsDisplay "replayFps"		_userPrefsNum="_userPrefsNum")
+		(element PingDisplay "replayPing"	_userPrefsNum="_userPrefsNum")
 	)
 )
