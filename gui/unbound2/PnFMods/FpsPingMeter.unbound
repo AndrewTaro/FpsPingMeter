@@ -1,5 +1,3 @@
-(def constant TT_FPSPINGMETER_INSTALLED true) #for modconfig
-
 (def constant FPM_FONT_SIZE
 	[
 		13,	# Default
@@ -56,20 +54,31 @@
 )
 
 
-(def element FpsDisplay(fps:number, _userPrefsNum:gfx=null) layout=true
+# The theme + size pair is read by all three display elements; folded so a silently-wrong key has one
+# place to live.  Both are ordinals into the constant tables above, not values.
+(def macro FPM_GET_FONT_PREFS ()
+	(macro TT_GET_PREF _varName="'__fontStylePref'" _key="'fpsPingMeter.fontStyle'")
+	(var __fontStyleValue:number = "null != __fontStylePref && null != __fontStylePref.value ? __fontStylePref.value : 0")
+	(var fontStyleIndex:number = "__fontStyleValue < FPM_FONT_STYLE_MESSAGE.length ? __fontStyleValue : 0")
+
+	(macro TT_GET_PREF _varName="'__fontSizePref'" _key="'fpsPingMeter.fontSize'")
+	(var __fontSizeValue:number = "null != __fontSizePref && null != __fontSizePref.value ? __fontSizePref.value : 0")
+	(var fontSizeIndex:number = "__fontSizeValue < FPM_FONT_SIZE.length ? __fontSizeValue : 0")
+
+	(var messageFontStyle:str = "FPM_FONT_STYLE_MESSAGE[fontStyleIndex]")
+	(var valueFontStyle:str = "FPM_FONT_STYLE_VALUE[fontStyleIndex]")
+	(var fontSize:number = "FPM_FONT_SIZE[fontSizeIndex]")
+)
+
+(def element FpsDisplay(fps:number) layout=true
 	# mod
 	(scope
-		(macro TT_GET_PREF_NUMBER _varName="'fontStylePrefIndex'"	_pref="FPM_PREFS.FONT_STYLE")
-		(macro TT_GET_PREF_NUMBER _varName="'fontSizePrefIndex'"	_pref="FPM_PREFS.FONT_SIZE")
-		(macro TT_GET_PREF_NUMBER _varName="'fpsWarnThreshold'"	_pref="FPM_PREFS.FPS_WARN_THRESHOLD")
-		(macro TT_GET_PREF_NUMBER _varName="'fpsCritThreshold'"	_pref="FPM_PREFS.FPS_CRIT_THRESHOLD")
+		(macro FPM_GET_FONT_PREFS)
 
-		(var fontStyleIndex:number = "fontStylePrefIndex < FPM_FONT_STYLE_MESSAGE.length ? fontStylePrefIndex : 0")
-		(var fontSizeIndex:number = "fontSizePrefIndex < FPM_FONT_SIZE.length ? fontSizePrefIndex : 0")
-
-		(var messageFontStyle:str = "FPM_FONT_STYLE_MESSAGE[fontStyleIndex]")
-		(var valueFontStyle:str = "FPM_FONT_STYLE_VALUE[fontStyleIndex]")
-		(var fontSize:number = "FPM_FONT_SIZE[fontSizeIndex]")
+		(macro TT_GET_PREF _varName="'warnPref'" _key="'fpsPingMeter.fpsWarnThreshold'")
+		(var fpsWarnThreshold:number = "null != warnPref && null != warnPref.value ? warnPref.value : 55")
+		(macro TT_GET_PREF _varName="'critPref'" _key="'fpsPingMeter.fpsCritThreshold'")
+		(var fpsCritThreshold:number = "null != critPref && null != critPref.value ? critPref.value : 30")
 
 		(var warningColor:number = "fps < fpsCritThreshold	? FPM_FONT_COLOR.CRITICAL :
 									fps < fpsWarnThreshold	? FPM_FONT_COLOR.WARNING :
@@ -118,20 +127,15 @@
 	)
 )
 
-(def element PingDisplay(ping:number, _userPrefsNum:gfx=null) layout=true
+(def element PingDisplay(ping:number) layout=true
 	# mod
 	(scope
-		(macro TT_GET_PREF_NUMBER _varName="'fontStylePrefIndex'"	_pref="FPM_PREFS.FONT_STYLE")
-		(macro TT_GET_PREF_NUMBER _varName="'fontSizePrefIndex'"	_pref="FPM_PREFS.FONT_SIZE")
-		(macro TT_GET_PREF_NUMBER _varName="'pingWarnThreshold'"	_pref="FPM_PREFS.PING_WARN_THRESHOLD")
-		(macro TT_GET_PREF_NUMBER _varName="'pingCritThreshold'"	_pref="FPM_PREFS.PING_CRIT_THRESHOLD")
+		(macro FPM_GET_FONT_PREFS)
 
-		(var fontStyleIndex:number = "fontStylePrefIndex < FPM_FONT_STYLE_MESSAGE.length ? fontStylePrefIndex : 0")
-		(var fontSizeIndex:number = "fontSizePrefIndex < FPM_FONT_SIZE.length ? fontSizePrefIndex : 0")
-
-		(var messageFontStyle:str = "FPM_FONT_STYLE_MESSAGE[fontStyleIndex]")
-		(var valueFontStyle:str = "FPM_FONT_STYLE_VALUE[fontStyleIndex]")
-		(var fontSize:number = "FPM_FONT_SIZE[fontSizeIndex]")
+		(macro TT_GET_PREF _varName="'warnPref'" _key="'fpsPingMeter.pingWarnThreshold'")
+		(var pingWarnThreshold:number = "null != warnPref && null != warnPref.value ? warnPref.value : 100")
+		(macro TT_GET_PREF _varName="'critPref'" _key="'fpsPingMeter.pingCritThreshold'")
+		(var pingCritThreshold:number = "null != critPref && null != critPref.value ? critPref.value : 150")
 		(var warningColor:number = "ping > pingCritThreshold	? FPM_FONT_COLOR.CRITICAL :
 									ping > pingWarnThreshold	? FPM_FONT_COLOR.WARNING :
 									fontStyleIndex == 0 		? FPM_FONT_COLOR.THEME_DEFAULT
@@ -199,15 +203,7 @@
 		(var replayPing:number = "performance.replayPing" (event "performance.evChanged"))
 
 		# Mod
-		(macro TT_GET_USERPREF)
-		(macro TT_GET_PREF_NUMBER _varName="'fontStylePrefIndex'"	_pref="FPM_PREFS.FONT_STYLE")
-		(macro TT_GET_PREF_NUMBER _varName="'fontSizePrefIndex'"	_pref="FPM_PREFS.FONT_SIZE")
-
-		(var fontStyleIndex:number = "fontStylePrefIndex < FPM_FONT_STYLE_MESSAGE.length ? fontStylePrefIndex : 0")
-		(var fontSizeIndex:number = "fontSizePrefIndex < FPM_FONT_SIZE.length ? fontSizePrefIndex : 0")
-
-		(var messageFontStyle:str = "FPM_FONT_STYLE_MESSAGE[fontStyleIndex]")
-		(var fontSize:number = "FPM_FONT_SIZE[fontSizeIndex]")
+		(macro FPM_GET_FONT_PREFS)
 		#
 	)
 
@@ -222,8 +218,8 @@
 	)
 
 	(hblock
-		(element FpsDisplay "fps"	_userPrefsNum="_userPrefsNum")
-		(element PingDisplay "ping" _userPrefsNum="_userPrefsNum")
+		(element FpsDisplay "fps")
+		(element PingDisplay "ping")
 	)
 
 	(hblock
@@ -236,7 +232,7 @@
 			(text = 'Recorded')
 		)
 
-		(element FpsDisplay "replayFps"		_userPrefsNum="_userPrefsNum")
-		(element PingDisplay "replayPing"	_userPrefsNum="_userPrefsNum")
+		(element FpsDisplay "replayFps")
+		(element PingDisplay "replayPing")
 	)
 )
