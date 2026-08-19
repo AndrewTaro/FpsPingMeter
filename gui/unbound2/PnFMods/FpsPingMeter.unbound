@@ -6,67 +6,84 @@
 	]
 )
 
-(def constant FPM_FONT_STYLE_MESSAGE
-	[
-		'$FPM_MessageDefaultStyle',	# Default/Dark
-		'$FPM_MessageLightStyle',	# Light
-	]
-)
-
-(def constant FPM_FONT_STYLE_VALUE
-	[
-		'$FPM_ValueDefalutStyle',	# Default/Dark
-		'$FPM_ValueLightStyle',		# Light
-	]
-)
-
+# Threshold colours only.  The normal-state colour is the player's `fpsPingMeter.fontColor` pref, so
+# the old THEME_DEFAULT/THEME_LIGHT pair is gone — the theme dropdown it switched between no longer
+# exists.  These two stay because fps/ping pick them from the reading, not from a pref.
 (def constant FPM_FONT_COLOR {
 	CRITICAL		: 0xff4b1d,
 	WARNING			: 0xffb600,
-	THEME_DEFAULT	: 0xe5161616,
-	THEME_LIGHT		: 0xFFFFFF,
 })
 
+# Pre-publish fallbacks, used only until the prefs exist in the store.  Literal ARGB, matching the
+# schema defaults (the old THEME_DEFAULT, and the white the shadow always rendered).
+(def constant FPM_FONT_COLOR_DEFAULT 0xe5161616)
+(def constant FPM_SHADOW_COLOR_DEFAULT 0xFFFFFFFF)
+
+# ⚠ NEITHER CLASS MAY PULL IN A FILTER.  `(filters …)` is FIRST-wins — it is registered as a method,
+# not a property — so a filter reaching an element through `extends` silently defeats the one bound
+# locally, and the shadow pref would do nothing.
+#
+# That rules out the obvious family classes: `$FontFamilyDefault` and `$FontFamilyDefaultBold` both
+# `(extends $FontDropShadowFilter)` (res_unpack/gui/unbound2/pc/shared/font_styles.unbound:66-74).
+# `$Bold` is the same bold family WITHOUT the filter — the same escape TTaroMinimap took for its
+# marker text — and the regular weight is set directly for want of an equivalent.
+#
+# $FontColorFPS carries no filter (it is only `textColor = 0xe5161616`, and is where the mod's old
+# THEME_DEFAULT came from).  It is kept so the class still renders sanely if an element ever forgets
+# to bind textColor.
 (def css $FPM_MessageDefaultStyle()
-	(extends $FontFamilyDefault)
-	(extends $FontFpsDropShadowWhite)
+	(fontFamily = '$WWSDefaultFont')
 	(extends $FontColorFPS)
 	(extends $TextMouseDisable)
 )
 
 (def css $FPM_ValueDefalutStyle()
-	(extends $FontFamilyDefaultBold)
-	(extends $FontFpsDropShadowWhite)
+	(extends $Bold)
 	(extends $FontColorFPS)
 	(extends $TextMouseDisable)
 )
 
-(def css $FPM_MessageLightStyle()
-	(extends $FPM_MessageDefaultStyle)
-	(extends $FontColorWhite)
-	(extends $FontDropShadowFilter)
+# The Light variants are gone with the theme dropdown: $FontColorWhite is superseded by `fontColor`,
+# and $FontDropShadowFilter by `shadowColor`.
+#
+# Parameters match what the fps/ping values already used inline, so all six texts now share one shadow
+# shape and differ only in colour.
+(def macro FPM_TEXT_DROPSHADOW ()
+	(filters
+		(dropShadow
+			(distance = 0)
+			(angle = 90)
+			(bind color "shadowColor")
+			(bind alpha "shadowAlpha")
+			(blurX = 2.0)
+			(blurY = 2.0)
+			(strength = 0.6)
+			(quality = 2)
+		)
+	)
 )
 
-(def css $FPM_ValueLightStyle()
-	(extends $FPM_ValueDefalutStyle)
-	(extends $FontColorWhite)
-	(extends $FontDropShadowFilter)
-)
 
-
-# The theme + size pair is read by all three display elements; folded so a silently-wrong key has one
-# place to live.  Both are ordinals into the constant tables above, not values.
+# The two colours + size are read by all three display elements; folded so a silently-wrong key has one
+# place to live.  Size is an ordinal into the table above; the colours are packed ARGB values.
+#
+# A colour is bound STRAIGHT to its target and never unpacked here — arithmetic on a packed value
+# >= 2^31 overflows in the view.  The filter wants its alpha separately, so that comes off the pref
+# object's normalized `.a` (0..1) rather than being shifted out of the packed number.
 (def macro FPM_GET_FONT_PREFS ()
-	(macro TT_GET_PREF _varName="'__fontStylePref'" _key="'fpsPingMeter.fontStyle'")
-	(var __fontStyleValue:number = "null != __fontStylePref && null != __fontStylePref.value ? __fontStylePref.value : 0")
-	(var fontStyleIndex:number = "__fontStyleValue < FPM_FONT_STYLE_MESSAGE.length ? __fontStyleValue : 0")
+	(macro TT_GET_PREF _varName="'__fontColorPref'" _key="'fpsPingMeter.font.color'")
+	(var fontColor:number = "null != __fontColorPref && null != __fontColorPref.value ? __fontColorPref.value : FPM_FONT_COLOR_DEFAULT")
 
-	(macro TT_GET_PREF _varName="'__fontSizePref'" _key="'fpsPingMeter.fontSize'")
+	(macro TT_GET_PREF _varName="'__shadowColorPref'" _key="'fpsPingMeter.font.shadowColor'")
+	(var shadowColor:number = "null != __shadowColorPref && null != __shadowColorPref.value ? __shadowColorPref.value : FPM_SHADOW_COLOR_DEFAULT")
+	(var shadowAlpha:number = "null != __shadowColorPref && isNumber(__shadowColorPref.a) ? __shadowColorPref.a : 1")
+
+	(macro TT_GET_PREF _varName="'__fontSizePref'" _key="'fpsPingMeter.font.size'")
 	(var __fontSizeValue:number = "null != __fontSizePref && null != __fontSizePref.value ? __fontSizePref.value : 0")
 	(var fontSizeIndex:number = "__fontSizeValue < FPM_FONT_SIZE.length ? __fontSizeValue : 0")
 
-	(var messageFontStyle:str = "FPM_FONT_STYLE_MESSAGE[fontStyleIndex]")
-	(var valueFontStyle:str = "FPM_FONT_STYLE_VALUE[fontStyleIndex]")
+	(var messageFontStyle:str = "'$FPM_MessageDefaultStyle'")
+	(var valueFontStyle:str = "'$FPM_ValueDefalutStyle'")
 	(var fontSize:number = "FPM_FONT_SIZE[fontSizeIndex]")
 )
 
@@ -81,9 +98,8 @@
 		(var fpsCritThreshold:number = "null != critPref && null != critPref.value ? critPref.value : 30")
 
 		(var warningColor:number = "fps < fpsCritThreshold	? FPM_FONT_COLOR.CRITICAL :
-									fps < fpsWarnThreshold	? FPM_FONT_COLOR.WARNING :
-									fontStyleIndex == 0   	? FPM_FONT_COLOR.THEME_DEFAULT
-															: FPM_FONT_COLOR.THEME_LIGHT
+									fps < fpsWarnThreshold	? FPM_FONT_COLOR.WARNING
+															: fontColor
 		"
 		)
 	)
@@ -106,8 +122,8 @@
 				(dropShadow 
 					(distance = 0)
 					(angle = 90)
-					(bind color "fps < fpsWarnThreshold ? 0x000000 : 0xFFFFFF")
-					(alpha = 1.0)
+					(bind color "fps < fpsWarnThreshold ? 0x000000 : shadowColor")
+					(bind alpha "fps < fpsWarnThreshold ? 1.0 : shadowAlpha")
 					(blurX = 2.0)
 					(blurY = 2.0)
 					(strength = 0.6)
@@ -121,6 +137,8 @@
 		(bind class "messageFontStyle")
 		(style
 			(bind fontSize "fontSize")
+			(bind textColor "fontColor")
+			(macro FPM_TEXT_DROPSHADOW)
 		)
 		#
 		(text = 'FPS')
@@ -137,9 +155,8 @@
 		(macro TT_GET_PREF _varName="'critPref'" _key="'fpsPingMeter.pingCritThreshold'")
 		(var pingCritThreshold:number = "null != critPref && null != critPref.value ? critPref.value : 150")
 		(var warningColor:number = "ping > pingCritThreshold	? FPM_FONT_COLOR.CRITICAL :
-									ping > pingWarnThreshold	? FPM_FONT_COLOR.WARNING :
-									fontStyleIndex == 0 		? FPM_FONT_COLOR.THEME_DEFAULT
-																: FPM_FONT_COLOR.THEME_LIGHT
+									ping > pingWarnThreshold	? FPM_FONT_COLOR.WARNING
+																: fontColor
 		"
 		)
 	)
@@ -154,6 +171,8 @@
 		(bind class "messageFontStyle")
 		(style
 			(bind fontSize "fontSize")
+			(bind textColor "fontColor")
+			(macro FPM_TEXT_DROPSHADOW)
 		)
 		#
 		(text = 'ping')
@@ -170,8 +189,8 @@
 				(dropShadow 
 					(distance = 0)
 					(angle = 90)
-					(bind color "ping > pingWarnThreshold ? 0x000000 : 0xFFFFFF")
-					(alpha = 1.0)
+					(bind color "ping > pingWarnThreshold ? 0x000000 : shadowColor")
+					(bind alpha "ping > pingWarnThreshold ? 1.0 : shadowAlpha")
 					(blurX = 2.0)
 					(blurY = 2.0)
 					(strength = 0.6)
@@ -186,6 +205,8 @@
 		(bind class "messageFontStyle")
 		(style
 			(bind fontSize "fontSize")
+			(bind textColor "fontColor")
+			(macro FPM_TEXT_DROPSHADOW)
 		)
 		#
 		(text = 'ms')
@@ -228,6 +249,8 @@
 			(bind class "messageFontStyle")
 			(style
 				(bind fontSize "fontSize")
+				(bind textColor "fontColor")
+				(macro FPM_TEXT_DROPSHADOW)
 			)
 			(text = 'Recorded')
 		)
