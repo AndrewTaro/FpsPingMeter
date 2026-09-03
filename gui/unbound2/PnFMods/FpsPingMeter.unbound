@@ -6,7 +6,7 @@
 	]
 )
 
-# Threshold colours only.  The normal-state colour is the player's `fpsPingMeter.font.color` pref, so
+# Threshold colours only.  The normal-state colour is the player's `ttaro.fpsPingMeter.font.color` pref, so
 # the old THEME_DEFAULT/THEME_LIGHT pair is gone — the theme dropdown it switched between no longer
 # exists.  These two stay because fps/ping pick them from the reading, not from a pref.
 (def constant FPM_FONT_COLOR {
@@ -71,14 +71,14 @@
 # >= 2^31 overflows in the view.  The filter wants its alpha separately, so that comes off the pref
 # object's normalized `.a` (0..1) rather than being shifted out of the packed number.
 (def macro FPM_GET_FONT_PREFS ()
-	(macro TT_GET_PREF _varName="'__fontColorPref'" _key="'fpsPingMeter.font.color'")
+	(macro TT_GET_PREF _varName="'__fontColorPref'" _key="'ttaro.fpsPingMeter.font.color'")
 	(var fontColor:number = "null != __fontColorPref && null != __fontColorPref.value ? __fontColorPref.value : FPM_FONT_COLOR_DEFAULT")
 
-	(macro TT_GET_PREF _varName="'__shadowColorPref'" _key="'fpsPingMeter.font.shadowColor'")
+	(macro TT_GET_PREF _varName="'__shadowColorPref'" _key="'ttaro.fpsPingMeter.font.shadowColor'")
 	(var shadowColor:number = "null != __shadowColorPref && null != __shadowColorPref.value ? __shadowColorPref.value : FPM_SHADOW_COLOR_DEFAULT")
 	(var shadowAlpha:number = "null != __shadowColorPref && isNumber(__shadowColorPref.a) ? __shadowColorPref.a : 1")
 
-	(macro TT_GET_PREF _varName="'__fontSizePref'" _key="'fpsPingMeter.font.size'")
+	(macro TT_GET_PREF _varName="'__fontSizePref'" _key="'ttaro.fpsPingMeter.font.size'")
 	(var __fontSizeValue:number = "null != __fontSizePref && null != __fontSizePref.value ? __fontSizePref.value : 0")
 	(var fontSizeIndex:number = "__fontSizeValue < FPM_FONT_SIZE.length ? __fontSizeValue : 0")
 
@@ -92,9 +92,9 @@
 	(scope
 		(macro FPM_GET_FONT_PREFS)
 
-		(macro TT_GET_PREF _varName="'warnPref'" _key="'fpsPingMeter.fps.warnThreshold'")
+		(macro TT_GET_PREF _varName="'warnPref'" _key="'ttaro.fpsPingMeter.fps.warnThreshold'")
 		(var fpsWarnThreshold:number = "null != warnPref && null != warnPref.value ? warnPref.value : 55")
-		(macro TT_GET_PREF _varName="'critPref'" _key="'fpsPingMeter.fps.critThreshold'")
+		(macro TT_GET_PREF _varName="'critPref'" _key="'ttaro.fpsPingMeter.fps.critThreshold'")
 		(var fpsCritThreshold:number = "null != critPref && null != critPref.value ? critPref.value : 30")
 
 		(var warningColor:number = "fps < fpsCritThreshold	? FPM_FONT_COLOR.CRITICAL :
@@ -150,9 +150,9 @@
 	(scope
 		(macro FPM_GET_FONT_PREFS)
 
-		(macro TT_GET_PREF _varName="'warnPref'" _key="'fpsPingMeter.ping.warnThreshold'")
+		(macro TT_GET_PREF _varName="'warnPref'" _key="'ttaro.fpsPingMeter.ping.warnThreshold'")
 		(var pingWarnThreshold:number = "null != warnPref && null != warnPref.value ? warnPref.value : 100")
-		(macro TT_GET_PREF _varName="'critPref'" _key="'fpsPingMeter.ping.critThreshold'")
+		(macro TT_GET_PREF _varName="'critPref'" _key="'ttaro.fpsPingMeter.ping.critThreshold'")
 		(var pingCritThreshold:number = "null != critPref && null != critPref.value ? critPref.value : 150")
 		(var warningColor:number = "ping > pingCritThreshold	? FPM_FONT_COLOR.CRITICAL :
 									ping > pingWarnThreshold	? FPM_FONT_COLOR.WARNING
