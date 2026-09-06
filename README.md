@@ -11,7 +11,7 @@ This modification allows you to customize the FPS and Ping indicators in World o
 
 # Requirements
 You must install the following for this mod to work:
-- [TTaro Mod Config](../../../TTaroModConfig)
+- [TTaro Mod Config](../../../TTaroModUtils)
 
 # Install
 1. Download the zip.
