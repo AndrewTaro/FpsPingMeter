@@ -1,0 +1,95 @@
+{
+  "schemaVersion": 4,
+  "opVocabularyVersion": 1,
+  "slug": "fps-ping-meter",
+  "migrations": [
+    {
+      "version": 1,
+      "description": "flat keys → dotted ancestry keys; slider step index → value; palette index → packed ARGB",
+      "ops": [
+        {
+          "op": "rename",
+          "from": "fpsPingMeterFontSize",
+          "to": "fpsPingMeter.font.size"
+        },
+        {
+          "op": "rename",
+          "from": "fpsPingMeterFontStyle",
+          "to": "fpsPingMeter.font.color"
+        },
+        {
+          "op": "rename",
+          "from": "fpsPingMeterFpsCritThreshold",
+          "to": "fpsPingMeter.fps.critThreshold"
+        },
+        {
+          "op": "rename",
+          "from": "fpsPingMeterFpsWarnThreshold",
+          "to": "fpsPingMeter.fps.warnThreshold"
+        },
+        {
+          "op": "rename",
+          "from": "fpsPingMeterPingCritThreshold",
+          "to": "fpsPingMeter.ping.critThreshold"
+        },
+        {
+          "op": "rename",
+          "from": "fpsPingMeterPingWarnThreshold",
+          "to": "fpsPingMeter.ping.warnThreshold"
+        },
+        {
+          "op": "transform",
+          "from": "fpsPingMeter.fps.critThreshold",
+          "to": "fpsPingMeter.fps.critThreshold",
+          "transform": "stepIndex",
+          "args": {
+            "min": 30,
+            "step": 5
+          }
+        },
+        {
+          "op": "transform",
+          "from": "fpsPingMeter.fps.warnThreshold",
+          "to": "fpsPingMeter.fps.warnThreshold",
+          "transform": "stepIndex",
+          "args": {
+            "min": 30,
+            "step": 5
+          }
+        },
+        {
+          "op": "transform",
+          "from": "fpsPingMeter.ping.critThreshold",
+          "to": "fpsPingMeter.ping.critThreshold",
+          "transform": "stepIndex",
+          "args": {
+            "min": 50,
+            "step": 10
+          }
+        },
+        {
+          "op": "transform",
+          "from": "fpsPingMeter.ping.warnThreshold",
+          "to": "fpsPingMeter.ping.warnThreshold",
+          "transform": "stepIndex",
+          "args": {
+            "min": 50,
+            "step": 10
+          }
+        },
+        {
+          "op": "transform",
+          "from": "fpsPingMeter.font.color",
+          "to": "fpsPingMeter.font.color",
+          "transform": "paletteIndex",
+          "args": {
+            "palette": [
+              1447446,
+              16777215
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,117 @@
+{
+  "schemaVersion": 4,
+  "id": "cmtkswuwm0006v014pk6h8ejn",
+  "author": "ttaro",
+  "modName": "FPS/Ping Meter",
+  "slug": "fps-ping-meter",
+  "order": 6,
+  "tree": [
+    {
+      "kind": "group",
+      "key": "cmtktamhr00gwv0d4iwb4226u",
+      "label": "IDS_TT_TITLE_FONT_STYLE",
+      "collapse": "expanded",
+      "children": [
+        {
+          "kind": "setting",
+          "control": "dropdown",
+          "key": "fpsPingMeter.font.size",
+          "label": "IDS_TT_SIZE",
+          "default": 0,
+          "options": [
+            {
+              "value": 0,
+              "phrase": "Default"
+            },
+            {
+              "value": 1,
+              "phrase": "Medium"
+            },
+            {
+              "value": 2,
+              "phrase": "Big"
+            }
+          ]
+        },
+        {
+          "kind": "setting",
+          "control": "color",
+          "key": "fpsPingMeter.font.color",
+          "label": "IDS_TT_COLOR",
+          "default": 3843429910,
+          "min": 0,
+          "max": 4294967295
+        },
+        {
+          "kind": "setting",
+          "control": "color",
+          "key": "fpsPingMeter.font.shadowColor",
+          "label": "IDS_TT_SHADOW_COLOR",
+          "default": 4294967295,
+          "min": 0,
+          "max": 4294967295
+        }
+      ]
+    },
+    {
+      "kind": "group",
+      "key": "cmtktame800dzv0d4tvexlaxn",
+      "label": "IDS_TT_TITLE_FPS_THRESHOLD",
+      "collapse": "expanded",
+      "children": [
+        {
+          "kind": "setting",
+          "control": "slider",
+          "key": "fpsPingMeter.fps.warnThreshold",
+          "label": "IDS_TT_WARNING",
+          "default": 55,
+          "min": 30,
+          "max": 150,
+          "step": 5,
+          "decimals": 0
+        },
+        {
+          "kind": "setting",
+          "control": "slider",
+          "key": "fpsPingMeter.fps.critThreshold",
+          "label": "IDS_TT_CRITICAL",
+          "default": 30,
+          "min": 30,
+          "max": 150,
+          "step": 5,
+          "decimals": 0
+        }
+      ]
+    },
+    {
+      "kind": "group",
+      "key": "cmtktamly00jxv0d47s1cwmgw",
+      "label": "IDS_TT_TITLE_PING_THRESHOLD",
+      "collapse": "expanded",
+      "children": [
+        {
+          "kind": "setting",
+          "control": "slider",
+          "key": "fpsPingMeter.ping.warnThreshold",
+          "label": "IDS_TT_WARNING",
+          "default": 100,
+          "min": 50,
+          "max": 150,
+          "step": 10,
+          "decimals": 0
+        },
+        {
+          "kind": "setting",
+          "control": "slider",
+          "key": "fpsPingMeter.ping.critThreshold",
+          "label": "IDS_TT_CRITICAL",
+          "default": 150,
+          "min": 50,
+          "max": 150,
+          "step": 10,
+          "decimals": 0
+        }
+      ]
+    }
+  ]
+}
