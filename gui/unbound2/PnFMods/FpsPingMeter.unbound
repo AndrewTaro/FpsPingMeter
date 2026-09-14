@@ -76,7 +76,7 @@
 
 	(macro TT_GET_PREF _varName="'__shadowColorPref'" _key="'ttaro.fpsPingMeter.font.shadowColor'")
 	(var shadowColor:number = "null != __shadowColorPref && null != __shadowColorPref.value ? __shadowColorPref.value : FPM_SHADOW_COLOR_DEFAULT")
-	(var shadowAlpha:number = "null != __shadowColorPref && isNumber(__shadowColorPref.a) ? __shadowColorPref.a : 1")
+	(var shadowAlpha:number = "null != __shadowColorPref && null != __shadowColorPref.a ? __shadowColorPref.a : 1")
 
 	(macro TT_GET_PREF _varName="'__fontSizePref'" _key="'ttaro.fpsPingMeter.font.size'")
 	(var __fontSizeValue:number = "null != __fontSizePref && null != __fontSizePref.value ? __fontSizePref.value : 0")
