@@ -1,11 +1,11 @@
 {
   "schemaVersion": 4,
-  "opVocabularyVersion": 1,
+  "opVocabularyVersion": 3,
   "slug": "fps-ping-meter",
   "migrations": [
     {
       "version": 1,
-      "description": "flat keys → dotted ancestry keys; slider step index → value; palette index → packed ARGB",
+      "description": "flat keys → dotted ancestry keys; legacy values decoded and folded onto the derived keys",
       "ops": [
         {
           "op": "rename",
@@ -13,79 +13,129 @@
           "to": "fpsPingMeter.font.size"
         },
         {
-          "op": "rename",
-          "from": "fpsPingMeterFontStyle",
-          "to": "fpsPingMeter.font.color"
-        },
-        {
-          "op": "rename",
-          "from": "fpsPingMeterFpsCritThreshold",
-          "to": "fpsPingMeter.fps.critThreshold"
-        },
-        {
-          "op": "rename",
-          "from": "fpsPingMeterFpsWarnThreshold",
-          "to": "fpsPingMeter.fps.warnThreshold"
-        },
-        {
-          "op": "rename",
-          "from": "fpsPingMeterPingCritThreshold",
-          "to": "fpsPingMeter.ping.critThreshold"
-        },
-        {
-          "op": "rename",
-          "from": "fpsPingMeterPingWarnThreshold",
-          "to": "fpsPingMeter.ping.warnThreshold"
-        },
-        {
           "op": "transform",
-          "from": "fpsPingMeter.fps.critThreshold",
-          "to": "fpsPingMeter.fps.critThreshold",
-          "transform": "stepIndex",
-          "args": {
-            "min": 30,
-            "step": 5
-          }
-        },
-        {
-          "op": "transform",
-          "from": "fpsPingMeter.fps.warnThreshold",
-          "to": "fpsPingMeter.fps.warnThreshold",
-          "transform": "stepIndex",
-          "args": {
-            "min": 30,
-            "step": 5
-          }
-        },
-        {
-          "op": "transform",
-          "from": "fpsPingMeter.ping.critThreshold",
-          "to": "fpsPingMeter.ping.critThreshold",
-          "transform": "stepIndex",
-          "args": {
-            "min": 50,
-            "step": 10
-          }
-        },
-        {
-          "op": "transform",
-          "from": "fpsPingMeter.ping.warnThreshold",
-          "to": "fpsPingMeter.ping.warnThreshold",
-          "transform": "stepIndex",
-          "args": {
-            "min": 50,
-            "step": 10
-          }
-        },
-        {
-          "op": "transform",
-          "from": "fpsPingMeter.font.color",
+          "transform": "compose",
           "to": "fpsPingMeter.font.color",
-          "transform": "paletteIndex",
-          "args": {
-            "palette": [
-              1447446,
-              16777215
+          "sources": [
+            {
+              "key": "fpsPingMeterFontStyle"
+            }
+          ],
+          "value": {
+            "argb": {
+              "rgb": {
+                "table": {
+                  "index": {
+                    "src": 0
+                  },
+                  "values": [
+                    1447446,
+                    16777215
+                  ],
+                  "fallback": 1447446
+                }
+              },
+              "a": 255
+            }
+          }
+        },
+        {
+          "op": "transform",
+          "transform": "compose",
+          "to": "fpsPingMeter.fps.critThreshold",
+          "sources": [
+            {
+              "key": "fpsPingMeterFpsCritThreshold"
+            }
+          ],
+          "value": {
+            "add": [
+              30,
+              {
+                "mul": [
+                  {
+                    "round": {
+                      "src": 0
+                    }
+                  },
+                  5
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "op": "transform",
+          "transform": "compose",
+          "to": "fpsPingMeter.fps.warnThreshold",
+          "sources": [
+            {
+              "key": "fpsPingMeterFpsWarnThreshold"
+            }
+          ],
+          "value": {
+            "add": [
+              30,
+              {
+                "mul": [
+                  {
+                    "round": {
+                      "src": 0
+                    }
+                  },
+                  5
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "op": "transform",
+          "transform": "compose",
+          "to": "fpsPingMeter.ping.critThreshold",
+          "sources": [
+            {
+              "key": "fpsPingMeterPingCritThreshold"
+            }
+          ],
+          "value": {
+            "add": [
+              50,
+              {
+                "mul": [
+                  {
+                    "round": {
+                      "src": 0
+                    }
+                  },
+                  10
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "op": "transform",
+          "transform": "compose",
+          "to": "fpsPingMeter.ping.warnThreshold",
+          "sources": [
+            {
+              "key": "fpsPingMeterPingWarnThreshold"
+            }
+          ],
+          "value": {
+            "add": [
+              50,
+              {
+                "mul": [
+                  {
+                    "round": {
+                      "src": 0
+                    }
+                  },
+                  10
+                ]
+              }
             ]
           }
         }
