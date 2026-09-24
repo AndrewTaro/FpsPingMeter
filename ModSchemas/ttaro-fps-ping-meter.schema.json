@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 4,
+  "schemaVersion": 5,
   "id": "cmtkswuwm0006v014pk6h8ejn",
   "author": "ttaro",
   "modName": "FPS/Ping Meter",
@@ -9,6 +9,7 @@
     {
       "kind": "group",
       "key": "cmtktamhr00gwv0d4iwb4226u",
+      "display": "section",
       "label": "IDS_TT_TITLE_FONT_STYLE",
       "collapse": "expanded",
       "children": [
@@ -56,6 +57,7 @@
     {
       "kind": "group",
       "key": "cmtktame800dzv0d4tvexlaxn",
+      "display": "section",
       "label": "IDS_TT_TITLE_FPS_THRESHOLD",
       "collapse": "expanded",
       "children": [
@@ -86,6 +88,7 @@
     {
       "kind": "group",
       "key": "cmtktamly00jxv0d47s1cwmgw",
+      "display": "section",
       "label": "IDS_TT_TITLE_PING_THRESHOLD",
       "collapse": "expanded",
       "children": [
