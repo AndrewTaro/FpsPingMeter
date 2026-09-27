@@ -5,6 +5,7 @@
   "modName": "FPS/Ping Meter",
   "slug": "fps-ping-meter",
   "order": 6,
+  "migrationVersion": 1,
   "tree": [
     {
       "kind": "group",
